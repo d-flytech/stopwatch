@@ -21,9 +21,16 @@ function timer () {
     let min = Math.floor((seconds - (hrs * 3600)) / 60);
     let secs = seconds % 60;
 
-    if (hrs < 10) hrs = '0' + hrs;
-    if (min < 10) min = '0' + min;
-    if (secs < 10) secs = '0' + secs;
+    if (hrs < 10) {
+        hrs = '0' + hrs;
+    }
+    if (min < 10) {
+        min = '0' + min;
+    }
+    if (secs < 10) {
+        secs = '0' + secs;
+    }
+    
     
 
     time_el.innerText = `${hrs} : ${min} : ${secs}`;
