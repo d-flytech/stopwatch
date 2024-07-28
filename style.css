@@ -46,7 +46,7 @@ body {
     cursor: pointer;
 
     background-color: var(--primary);
-    font-size: 1.rem;
+    font-size: 1rem;
     text-transform: uppercase;
     color: var(--light);
     margin: auto;
