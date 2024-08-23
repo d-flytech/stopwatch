@@ -12,35 +12,35 @@ class Stopwatch {
         const lap_btn = document.getElementById('lap');
         const laps_el = document.querySelector('.watch .laps');
 
-
         let seconds = 0;
         let interval = null;
-        let lapCount = 0;
+        let lapTimes = JSON.parse(localStorage.getItem('lapTimes')) || [];
 
         start_btn.addEventListener('click', start);
         stop_btn.addEventListener('click', stop);
         reset_btn.addEventListener('click', reset);
         lap_btn.addEventListener('click', lap);
 
+        updateLaps();
 
+        function formatTime(seconds) {
+            const hrs = `${Math.floor(seconds / 3600)}`.padStart(2, '0');
+            const min = `${Math.floor((seconds % 3600) / 60)}`.padStart(2, '0');
+            const secs = `${seconds % 60.}`.padStart(2, '0');
+
+            return `${hrs}:${min}:${secs}`;
+        }
 
         function timer() {
             seconds++;
-
-            const hrs = String(Math.floor(seconds / 3600)).toString().padStart(2, '0');
-            const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-            const secs = String(seconds % 60).padStart(2, '0');
-
-            time_el.innerText = `${hrs}:${min}:${secs}`;
+            time_el.innerText = formatTime(seconds);
         }
 
         function start() {
             if (interval) {
                 return
             }
-
             interval = setInterval(timer, 1000);
-
         }
 
         function stop() {
@@ -51,28 +51,36 @@ class Stopwatch {
         function reset() {
             stop();
             seconds = 0;
-            time_el.innerText = `00:00:00`;
+            time_el.innerText = formatTime(seconds);
             laps_el.innerHTML = '';
-            lapCount= 0;
+            lapTimes = [];
+
+            localStorage.removeItem('lapTimes');
         }
 
         function lap() {
             if (interval) {
-                lapCount++;
-                const hrs = String(Math.floor(seconds / 3600)).toString().padStart(2, '0');
-                const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-                const secs = String(seconds % 60).padStart(2, '0');
-    
-                const lapTime = `${hrs}:${min}:${secs}`;
-
-                const lap_el = document.createElement('div');
-                lap_el.innerText = `Lap ${lapCount}: ${lapTime}`;
-                laps_el.appendChild(lap_el);
-                stop();
+                lapTimes.push(seconds);
+                updateLaps();
+                saveLapTimes();
             }
         }
 
+        function updateLaps() {
+            laps_el.innerHTML = '';
+            lapTimes.forEach((lapTime, index) => {
+                const lap_el = document.createElement('div');
+                lap_el.innerText = `Lap ${index + 1}: ${formatTime(lapTime)}`;
+
+                laps_el.appendChild(lap_el);
+            });
+        }
+        
+        function saveLapTimes() {
+            localStorage.setItem('lapTimes', JSON.stringify(lapTimes));
+        }
 
     }
 
 }
+
