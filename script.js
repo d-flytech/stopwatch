@@ -21,7 +21,6 @@ class Stopwatch {
         this.reset_btn.addEventListener('click', this.reset);
         this.lap_btn.addEventListener('click', this.lap);
 
-        this.updateLaps();
     }
 
     // methodes als arrow functions gedefinieerd i.p.v. binden
@@ -61,24 +60,46 @@ class Stopwatch {
     lap = () => {
         if (this.interval) {
             this.lapTimes.push(this.seconds);
-            this.updateLaps();
+            this.updateLapsDom();
             this.saveLapTimes();
         }
     }
-
+    // berekenen van lap times (logic, pure function)
     updateLaps = () => {
-        this.laps_el.innerHTML = '';
-        this.lapTimes.forEach((lapTime, index) => {
-            const lap_el = document.createElement('div');
-            lap_el.innerText = `Lap ${index + 1}: ${this.formatTime(lapTime)}`;
-
-            this.laps_el.appendChild(lap_el);
+        return this.lapTimes.map((lapTime, index) => {
+            return `Lap ${index + 1}: ${this.formatTime(lapTime)}`;
         });
     }
 
     saveLapTimes = () => {
         sessionStorage.setItem('lapTimes', JSON.stringify(this.lapTimes));
     }
+    //Dom update (presentation,impure function)
+    updateLapsDom = () => {
+        const laps = this.updateLaps();
+        this.laps_el.innerHTML = '';
+        laps.forEach(lapText => {
+            const lap_el = document.createElement('div');
+            lap_el.innerText = lapText;
+
+            this.laps_el.appendChild(lap_el);
+        });
+    }
+    
+    //function initiële update van laps 
+    initializeLaps = () => {
+        this.updateLapsDOM();
+    }
 }
+
+
+//een nieuw Stopwatch-object en roept de initializeLaps-methode aan
+const stopwatch = new Stopwatch();
+stopwatch.initializeLaps();
+
+export default Stopwatch;
+
+
+
 
 
