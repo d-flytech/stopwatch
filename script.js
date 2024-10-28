@@ -1,19 +1,21 @@
-window.addEventListener("DOMContentLoaded", () => {
-    new Stopwatch();
-});
-
 class Stopwatch {
-    constructor() {
-        this.time_el = document.querySelector('.watch .time');
-        this.start_btn = document.getElementById('start');
-        this.stop_btn = document.getElementById('stop');
-        this.reset_btn = document.getElementById('reset');
-        this.lap_btn = document.getElementById('lap');
-        this.laps_el = document.querySelector('.watch .laps');
+    constructor(options) {
+        this.options = options || {};
+        this.id = this.options.id || `stopwatch-${Date.now()}`;
+
+        this.createHtml();
+
+        this.watch_el = document.getElementById(this.id);
+        this.time_el = this.watch_el.querySelector('.time');
+        this.start_btn = this.watch_el.querySelector('.start');
+        this.stop_btn = this.watch_el.querySelector('.stop');
+        this.reset_btn = this.watch_el.querySelector('.reset');
+        this.lap_btn = this.watch_el.querySelector('.lap');
+        this.laps_el = this.watch_el.querySelector('.laps');
 
         this.seconds = 0;
         this.interval = null;
-        this.lapTimes = JSON.parse(sessionStorage.getItem('lapTimes')) || [];// sessionStorage i.p.v. localStorage gebruikt
+        this.lapTimes = JSON.parse(sessionStorage.getItem(`${this.id}-lapTimes`)) || [];// sessionStorage i.p.v. localStorage gebruikt
 
         // arrow functions gebruikt i.p.v. binden voor event listeners
         this.start_btn.addEventListener('click', this.start);
@@ -21,6 +23,24 @@ class Stopwatch {
         this.reset_btn.addEventListener('click', this.reset);
         this.lap_btn.addEventListener('click', this.lap);
 
+        this.initializeLaps();
+    }
+
+    createHtml() {
+        const container = document.createElement('div');
+        container.id = this.id;
+        container.classList.add('watch');
+        container.innerHTML = `
+        <div class="time">00:00:00</div>
+        <div class="controls">
+            <button class='start'>start</button>
+            <button class='stop'>stop</button>
+            <button class='reset'>reset</button>
+            <button class='lap'>lap</button>
+        </div>
+        <div class="laps"></div> `;
+
+        document.body.appendChild(container);
     }
 
     // methodes als arrow functions gedefinieerd i.p.v. binden
@@ -54,7 +74,7 @@ class Stopwatch {
         this.laps_el.innerHTML = '';
         this.lapTimes = [];
 
-        sessionStorage.removeItem('lapTimes');
+        sessionStorage.removeItem(`${this.id}-lapTimes`);
     }
 
     lap = () => {
@@ -72,7 +92,7 @@ class Stopwatch {
     }
 
     saveLapTimes = () => {
-        sessionStorage.setItem('lapTimes', JSON.stringify(this.lapTimes));
+        sessionStorage.setItem(`${this.id}-lapTimes`, JSON.stringify(this.lapTimes));
     }
     //Dom update (presentation,impure function)
     updateLapsDom = () => {
@@ -88,14 +108,9 @@ class Stopwatch {
     
     //function initiële update van laps 
     initializeLaps = () => {
-        this.updateLapsDOM();
+        this.updateLapsDom();
     }
 }
-
-
-//een nieuw Stopwatch-object en roept de initializeLaps-methode aan
-const stopwatch = new Stopwatch();
-stopwatch.initializeLaps();
 
 export default Stopwatch;
 
